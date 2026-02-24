@@ -21,6 +21,7 @@ namespace Game.Achievements
         private readonly Dictionary<string, AchievementState> states = new();
 
         private IAchievementProgressStore store;
+        private bool initialized;
 
         public event Action<AchievementProgressChanged> ProgressChanged;
         public event Action<AchievementUnlocked> Unlocked;
@@ -29,6 +30,33 @@ namespace Game.Achievements
 
         private void Awake()
         {
+            Initialize();
+        }
+
+        public void Configure(AchievementDatabase overrideDatabase, IAchievementProgressStore overrideStore = null, bool? overrideAutoSave = null)
+        {
+            database = overrideDatabase;
+            store = overrideStore;
+
+            if (overrideAutoSave.HasValue)
+            {
+                autoSaveOnChange = overrideAutoSave.Value;
+            }
+
+            initialized = false;
+        }
+
+        public void Initialize()
+        {
+            if (initialized)
+            {
+                return;
+            }
+
+            store ??= new PlayerPrefsAchievementProgressStore(playerPrefsSaveKey);
+            InitializeStates(store.Load());
+            RecalculateRewardPoints();
+            initialized = true;
             store = new PlayerPrefsAchievementProgressStore(playerPrefsSaveKey);
             InitializeStates(store.Load());
             RecalculateRewardPoints();
@@ -36,6 +64,11 @@ namespace Game.Achievements
 
         public void AddProgress(string statKey, int amount = 1)
         {
+            if (!initialized)
+            {
+                Initialize();
+            }
+
             if (database == null || string.IsNullOrWhiteSpace(statKey) || amount == 0)
             {
                 return;

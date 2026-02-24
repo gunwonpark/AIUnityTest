@@ -19,6 +19,16 @@ namespace Game.Achievements
             return cache.TryGetValue(id, out definition);
         }
 
+        public void SetAchievements(IEnumerable<AchievementDefinition> definitions)
+        {
+            achievements = new List<AchievementDefinition>(definitions);
+            cache.Clear();
+
+#if UNITY_EDITOR
+            OnValidate();
+#endif
+        }
+
         private void BuildCacheIfNeeded()
         {
             if (cache.Count == achievements.Count)

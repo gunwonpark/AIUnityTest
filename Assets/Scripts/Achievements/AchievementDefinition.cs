@@ -26,6 +26,21 @@ namespace Game.Achievements
         public int TargetValue => targetValue;
         public int RewardPoints => rewardPoints;
 
+        public void Configure(string newId, string newTitle, string newDescription, bool isHidden, string trackedStatKey, int target, int reward)
+        {
+            id = newId;
+            title = newTitle;
+            description = newDescription;
+            hidden = isHidden;
+            statKey = trackedStatKey;
+            targetValue = target;
+            rewardPoints = reward;
+
+#if UNITY_EDITOR
+            OnValidate();
+#endif
+        }
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
