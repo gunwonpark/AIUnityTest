@@ -57,6 +57,9 @@ namespace Game.Achievements
             InitializeStates(store.Load());
             RecalculateRewardPoints();
             initialized = true;
+            store = new PlayerPrefsAchievementProgressStore(playerPrefsSaveKey);
+            InitializeStates(store.Load());
+            RecalculateRewardPoints();
         }
 
         public void AddProgress(string statKey, int amount = 1)
